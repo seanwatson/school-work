@@ -1,0 +1,126 @@
+// An implementation of templated class "List"
+
+#include "cs1037assert.h"  // Our alternative to #include <cassert>  
+
+template <class Item>
+List<Item> :: List(unsigned int capacity) {
+    m_max_capacity = capacity;
+    m_container = new Item[m_max_capacity];
+    m_size = 0;
+} 
+
+template <class Item>
+List<Item> :: ~List( ) {
+    delete [] m_container;
+}
+
+template <class Item>
+bool List<Item> :: isEmpty( ) const {
+    return (m_size == 0);
+}
+
+template <class Item>
+bool List<Item> :: isFull( ) const {
+    return false;
+}
+
+template <class Item>
+unsigned int List<Item> :: getLength( ) const {
+    return m_size;
+}
+
+template <class Item>
+void List<Item> :: insert(unsigned int pos, Item item) {
+    // PRECONDITION: pos is between 1 and m_size+1
+    Assert( (pos >= 1) && (pos <= m_size+1) , "List index is out of bounds (in insert)" );		
+    if (m_size == m_max_capacity) replaceContainer( );
+    for (unsigned int k = m_size; k >= pos; k--)
+        m_container[translate(k+1)] = m_container[translate(k)];
+    m_container[translate(pos)] =  item;
+    m_size++;
+}
+
+template <class Item>
+Item List<Item> :: remove (unsigned int pos) {
+    // PRECONDITION: the list is not empty, and pos is between 1 and m_size
+    Assert(( pos >= 1) && (pos <= m_size), "List index is out of bounds (in remove)");
+    Item returnValue = m_container[translate(pos)];
+    for (unsigned int k=pos+1; k<=m_size; k++)
+        m_container[translate(k-1)] = m_container[translate(k)];
+    m_size--;
+    return returnValue;
+} 
+
+template <class Item>
+Item List<Item> :: retrieve(unsigned int pos) const {
+    // PRECONDITION: the list is not empty, and pos is between 1 and m_size
+    Assert(( pos >= 1) && (pos <= m_size), "List index is out of bounds (in retrieve)");
+    return m_container[translate(pos)];
+}
+
+template <class Item>
+Item List<Item> :: replace( unsigned int pos, Item item ) {
+    // PRECONDITION: the list is not empty, and pos is between 1 and m_size
+    Assert(( pos >= 1) && (pos <= m_size), "List index is out of bounds (in replace)");
+    Item returnVal = m_container[translate(pos)];
+    m_container[translate(pos)] = item;
+    return returnVal;
+}
+
+template <class Item>
+void List<Item> :: swap(unsigned i, unsigned j) {
+    // PRECONDITION: indexes iand j should be within the range of the list
+    Assert(( i >= 1) && (i <= m_size) && ( j >= 1) && (j <= m_size), "List index is out of bounds (in swap)");
+    if (i==j) return;
+    Item temp = m_container[translate(i)]; 
+    m_container[translate(i)] = m_container[translate(j)];
+    m_container[translate(j)] = temp;
+}
+
+template <class Item>
+unsigned int List<Item> :: translate(unsigned int pos) const {
+    return pos-1;
+}
+
+template <class Item>
+void List<Item> :: replaceContainer( ) {
+    Item * newList;
+    newList = new Item[2 * m_max_capacity];
+    for (unsigned int k = 0; k < m_size; k++ ) 
+		newList[k] = m_container[k];
+    m_max_capacity = 2 * m_max_capacity;
+    delete [ ] m_container;
+    m_container = newList;
+}
+
+template <class Item> template <class Equality>
+int List<Item> :: find(Item key) const
+{
+    for (unsigned int i=1; i<=getLength(); i++) if (Equality::compare(retrieve(i),key)) return i;
+    return -1;
+}
+
+template <class Item> template <class Order>
+void List<Item> :: selectionSort( ) {
+    unsigned minSoFar, i, k;
+    for (i = 1; i < getLength(); i++ )   { // unsorted part starts at  i
+         minSoFar = i;
+         for (k = i+1; k <= getLength(); k++)  { //searching for minimum Item in the unsorted part
+               if (Order::compare(retrieve(k),retrieve(minSoFar)))
+                      minSoFar = k;
+         } 
+         swap(i,minSoFar);    // moving min Item into the end of the sorted part
+    } 
+}
+
+template <class Item> template <class Order>
+void List<Item>::insertionSort() {
+    unsigned i, k;
+    for (i = 2; i <= getLength(); i++ )   { // moving i-th Item into the sorted part of container
+         for (k = i-1; k > 0; k--) { 
+              if ( Order::compare(retrieve(k) , retrieve(k+1) ) )   break;
+              else swap(k,k+1);         // NOTE: i-th Item is shifted "down" until the right spot
+         }                              // inside sorted part [1 <= k <= (i-1)] is found
+    }
+}
+

@@ -1,0 +1,216 @@
+#include "cs1037assert.h"  // Our alternative to #include <cassert>  
+#include "cs1037util.h"    // NOTE: implementation of functions loadImage/saveImage/drawImage (below) 
+                           // use methods from "cs1037utils" library (32-windows) by A.Delong
+
+template <class T>
+Table2D<T> loadImage(const char * bmp_file_name) {
+    int im_tmp = CreateImageFromFile(bmp_file_name);  // loading new image
+    if (im_tmp==0) {return Table2D<T>();} // return empty Table2D
+    unsigned char * ptr, *ptr_col;
+    unsigned int x, y, row_bytes=0;
+    int bytes = GetImageBytesPerPixel(im_tmp);
+    Table2D<T> arr(GetImageSizeX(im_tmp),GetImageSizeY(im_tmp)); 
+    if (arr.getHeight()>1) row_bytes = (unsigned) (GetImagePixelPtr(im_tmp,0,1) - GetImagePixelPtr(im_tmp,0,0));
+    for (x=0; x<arr.getWidth(); x++) 
+    {
+        T* arr_column = arr[x]; // pointer to 1-st pixel in x-th column of "arr" (see Table2D.h)
+        ptr_col = GetImagePixelPtr(im_tmp,x,0);
+        unsigned  height = arr.getHeight(); // length of each column in "arr"
+        for (y=0; y<height; y++) 
+        { 
+            ptr = ptr_col+y*row_bytes;
+            if      (bytes==1)             arr_column[y] = (T) RGB(ptr[0],ptr[0],ptr[0]);
+            else if (bytes==3 || bytes==4) arr_column[y] = (T) RGB(ptr[2],ptr[1],ptr[0]);
+        }                                 // uses cast operators "(type) RGB", see Image2D.h 
+    }
+    DeleteImage(im_tmp);
+    return arr;
+}
+
+template <class T> 
+void drawImage(const Table2D<T>& arr, Point pos, double alpha)
+{drawImage(arr,Casting(),pos,alpha);}
+  
+template<class T, class ConversionToRGB>  
+void drawImage(const Table2D<T>& arr, const ConversionToRGB& f, Point pos, double alpha)
+{
+    if (arr.isEmpty()) return;
+    unsigned char * ptr, *ptr_col;
+    unsigned int x, y, row_bytes=0;
+    unsigned char trans = fit(alpha*255);
+    RGB c;
+    int im_tmp = CreateImage(arr.getWidth(),arr.getHeight(),"bgra"); 
+    if (arr.getHeight()>1) row_bytes = (unsigned) (GetImagePixelPtr(im_tmp,0,1) - GetImagePixelPtr(im_tmp,0,0));
+    for (x=0; x<arr.getWidth(); x++) 
+    {
+        T* arr_column = arr[x]; // pointer to 1-st pixel in x-th column of "arr" (see Table2D.h)
+        ptr_col = GetImagePixelPtr(im_tmp,x,0);
+        unsigned  height = arr.getHeight(); // length of each column in "arr"
+        for (y=0; y<height; y++) 
+        {
+            f.convert(c,arr_column[y]); // "arr_column[y]" is equivalent to "arr[x][y]" 
+            ptr = ptr_col+y*row_bytes;
+            ptr[0]=c.b; // [0] is blue
+            ptr[1]=c.g; // [1] is green
+            ptr[2]=c.r; // [2] is red
+            ptr[3]=trans; // [3] is "alpha mat" (or transparancy)			
+        }
+    }
+    DrawImage(im_tmp,pos.x,pos.y);
+    DeleteImage(im_tmp);
+}
+
+template<class T, class ConversionToRGB>
+void drawImage(const Table2D<T>& arr, const ConversionToRGB& f, const Table2D<double>& alpha_mat, Point pos)
+{
+    if (arr.isEmpty()) return;
+    Assert(arr.getWidth()==alpha_mat.getWidth() && arr.getHeight()==alpha_mat.getHeight(),"array and alpha mat has different size (in drawImage)");
+    unsigned char * ptr, *ptr_col;
+    unsigned int x, y, row_bytes=0;
+    RGB c;
+    int im_tmp = CreateImage(arr.getWidth(),arr.getHeight(),"bgra"); 
+    if (arr.getHeight()>1) row_bytes = (unsigned) (GetImagePixelPtr(im_tmp,0,1) - GetImagePixelPtr(im_tmp,0,0));
+    for (x=0; x<arr.getWidth(); x++) 
+    {
+        T* arr_column = arr[x]; // pointer to 1-st pixel in x-th column of "arr" (see Table2D.h)
+        double* mat_column = alpha_mat[x]; 
+        ptr_col = GetImagePixelPtr(im_tmp,x,0);
+        unsigned  height = arr.getHeight(); // length of each column in "arr"
+        for (y=0; y<height; y++) 
+        {
+            f.convert(c,arr_column[y]); // "arr_column[y]" is equivalent to "arr[x][y]" 
+            ptr = ptr_col+y*row_bytes;
+            ptr[0]=c.b; // [0] is blue
+            ptr[1]=c.g; // [1] is green
+            ptr[2]=c.r; // [2] is red
+            ptr[3]=fit(mat_column[y]*255.0); // [3] is "alpha mat" (or transparancy)			
+        }
+    }
+    DrawImage(im_tmp,pos.x,pos.y);
+    DeleteImage(im_tmp);
+}
+
+template<class T>
+void drawImage(const Table2D<T>& arr, const RGB* palette, const double* alpha, Point pos)
+{
+    if (arr.isEmpty()) return;
+    unsigned char * ptr, *ptr_col;
+    unsigned int x, y, row_bytes=0;
+    RGB c;
+    int im_tmp = CreateImage(arr.getWidth(),arr.getHeight(),"bgra"); 
+    if (arr.getHeight()>1) row_bytes = (unsigned) (GetImagePixelPtr(im_tmp,0,1) - GetImagePixelPtr(im_tmp,0,0));
+    for (x=0; x<arr.getWidth(); x++) 
+    {
+        T* arr_column = arr[x]; // pointer to 1-st pixel in x-th column of "arr" (see Table2D.h)
+        ptr_col = GetImagePixelPtr(im_tmp,x,0);
+        unsigned  height = arr.getHeight(); // length of each column in "arr"
+        for (y=0; y<height; y++) 
+        {
+            c = palette[arr_column[y]]; // "arr_column[y]" is equivalent to "arr[x][y]" 
+            ptr = ptr_col+y*row_bytes;
+            ptr[0]=c.b; // [0] is blue
+            ptr[1]=c.g; // [1] is green
+            ptr[2]=c.r; // [2] is red
+            ptr[3]=fit(alpha[arr_column[y]]*255); // [3] is "alpha mat" (or transparancy)			
+        }
+    }
+    DrawImage(im_tmp,pos.x,pos.y);
+    DeleteImage(im_tmp);
+}
+
+template <class T>
+void saveImage(const Table2D<T>& arr, const char * bmp_file_name)
+{saveImage(arr,Casting(),bmp_file_name);}
+
+template<class T, class ConversionToRGB>
+void saveImage(const Table2D<T>& arr, const ConversionToRGB& f, const char * bmp_file_name)
+{
+    if (arr.isEmpty()) return;
+    unsigned char * ptr, *ptr_col;
+    unsigned int x, y, row_bytes=0;
+    RGB c;
+    int im_tmp = CreateImage(arr.getWidth(),arr.getHeight(),"bgr"); 
+    if (arr.getHeight()>1) row_bytes = (unsigned) (GetImagePixelPtr(im_tmp,0,1) - GetImagePixelPtr(im_tmp,0,0));
+    for (x=0; x<arr.getWidth(); x++) 
+    {
+        T* arr_column = arr[x]; // pointer to 1-st pixel in x-th column of "arr" (see Table2D.h)
+        ptr_col = GetImagePixelPtr(im_tmp,x,0);
+        unsigned  height = arr.getHeight(); // length of each column in "arr"
+        for (y=0; y<height; y++) 
+        {
+            f.convert(c,arr_column[y]); // "arr_column[y]" is equivalent to "arr[x][y]" 
+            ptr = ptr_col+y*row_bytes;
+            ptr[0]=c.b; // [0] is blue
+            ptr[1]=c.g; // [1] is green
+            ptr[2]=c.r; // [2] is red
+        }
+    }
+    WriteImageToFile(im_tmp,bmp_file_name);
+    DeleteImage(im_tmp);
+}
+
+template<class T, class ConversionToRGB>  
+void saveImage(const Table2D<T>& arr, const ConversionToRGB& f, const Table2D<double>& alpha_mat, const char * bmp_file_name)
+{
+    if (arr.isEmpty()) return;
+    Assert(arr.getWidth()==alpha_mat.getWidth() && arr.getHeight()==alpha_mat.getHeight(),"array and alpha mat has different size (in drawImage)");
+    unsigned char * ptr, *ptr_col;
+    unsigned int x, y, row_bytes=0;
+    RGB c;
+    int im_tmp = CreateImage(arr.getWidth(),arr.getHeight(),"bgra"); 
+    if (arr.getHeight()>1) row_bytes = (unsigned) (GetImagePixelPtr(im_tmp,0,1) - GetImagePixelPtr(im_tmp,0,0));
+    for (x=0; x<arr.getWidth(); x++) 
+    {
+        T* arr_column = arr[x]; // pointer to 1-st pixel in x-th column of "arr" (see Table2D.h)
+        double* mat_column = alpha_mat[x]; 
+        ptr_col = GetImagePixelPtr(im_tmp,x,0);
+        unsigned  height = arr.getHeight(); // length of each column in "arr"
+        for (y=0; y<height; y++) 
+        {
+            f.convert(c,arr_column[y]); // "arr_column[y]" is equivalent to "arr[x][y]" 
+            ptr = ptr_col+y*row_bytes;
+            ptr[0]=c.b; // [0] is blue
+            ptr[1]=c.g; // [1] is green
+            ptr[2]=c.r; // [2] is red
+            ptr[3]=fit(mat_column[y]*255.0); // [3] is "alpha mat" (or transparancy)			
+        }
+    }
+    WriteImageToFile(im_tmp,bmp_file_name);
+    DeleteImage(im_tmp);
+}
+
+template <class T> 
+void splitRGB(const Table2D<RGB>& src, Table2D<T>& R, Table2D<T>& G, Table2D<T>& B)
+{
+    unsigned w = src.getWidth(), h = src.getHeight();
+    R.resize(w,h);
+    G.resize(w,h);
+    B.resize(w,h);
+    if (!src.isEmpty()) for (unsigned x=0; x<w; x++) 
+    {
+        T* colR   = R[x];
+        T* colG   = G[x];
+        T* colB   = B[x];
+        RGB* src_col = src[x];
+        for (unsigned y=0; y<h; y++) {colR[y] = (T) src_col[y].r; colG[y] = (T) src_col[y].g; colB[y] = (T) src_col[y].b;}
+     }
+}
+
+template <class T> 
+Table2D<RGB> combineRGB(const Table2D<T>& R, const Table2D<T>& G, const Table2D<T>& B)
+{
+    Table2D<RGB> trg;
+    unsigned w = R.getWidth(), h = R.getHeight();
+    Assert(w==G.getWidth() && w==B.getWidth(),"Tables of different width (in combineRGB)");
+    Assert(h==G.getHeight() && h==B.getHeight(),"Tables of different height (in combineRGB)");
+    trg.resize(w,h);
+    if (!trg.isEmpty()) for (unsigned x=0; x<w; x++) 
+    {
+        T* colR   = R[x];
+        T* colG   = G[x];
+        T* colB   = B[x];
+        RGB* trg_col = trg[x];
+        for (unsigned y=0; y<h; y++) trg_col[y] = RGB(fit(colR[y]),fit(colG[y]),fit(colB[y])); 
+     }
+     return trg;
+}

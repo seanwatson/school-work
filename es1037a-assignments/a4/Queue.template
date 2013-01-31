@@ -1,0 +1,45 @@
+// An implementation of templated class "Queue"
+
+#include "cs1037assert.h"  // Our alternative to #include <cassert>  
+
+
+template<class Item>
+Queue<Item> :: Queue()
+: m_container() 
+{ }
+
+template<class Item>
+Queue<Item> :: ~Queue( ) 
+{ }
+ 
+template<class Item>
+bool Queue<Item> :: isEmpty( ) const 
+{
+     return m_container.isEmpty( );
+}
+
+template<class Item>
+bool Queue<Item> :: isFull( ) const
+{
+     return false;
+}
+
+template<class Item>
+void Queue<Item> :: enqueue( Item k ) 
+{
+     m_container.addTail( k );
+} 
+
+template<class Item>
+Item Queue<Item> :: dequeue( ) 
+{    // precondition: queue must not be empty already
+     Assert(!isEmpty(),"Queue is empty (in dequeue)");
+     return m_container.removeHead( ); 
+}
+
+template<class Item>
+Item Queue<Item> :: peek( ) const 
+{    // precondition: queue must not be empty already
+     Assert(!isEmpty(),"Queue is empty (in peek)");
+     return m_container.retrieveHead( ); 
+}

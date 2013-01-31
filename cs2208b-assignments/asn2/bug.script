@@ -1,0 +1,90 @@
+Script started on Thu Feb 09 22:26:20 2012
+obelix[11]% pwd
+/student/swatso33/courses/cs2208/assignments/asn2
+obelix[12]% date
+Thu Feb  9 22:26:32 EST 2012
+obelix[13]% whoami
+swatso33
+obelix[14]% gcc -o buggy buggy.s iofunc.o
+obelix[15]% ls -l
+total 108
+-rwx------   1 swatso33 2ndyr       8800 Feb  9 20:24 asn2*
+-rw-------   1 swatso33 2ndyr       5193 Feb  9 20:19 asn2.m
+-rw-------   1 swatso33 2ndyr       4689 Feb  9 20:20 asn2.s
+-rw-------   1 swatso33 2ndyr          0 Feb  9 22:26 bug.out
+-rwx------   1 swatso33 2ndyr       8464 Feb  9 22:26 buggy*
+-rw-------   1 swatso33 2ndyr        364 Feb  9 20:24 buggy.s
+-rw-------   1 swatso33 2ndyr       3324 Feb  9 20:24 iofunc.o
+-rwx------   1 swatso33 2ndyr       5772 Feb  9 22:10 mystery*
+-rw-------   1 swatso33 2ndyr        508 Feb  9 21:55 mystery.s
+-rw-------   1 swatso33 2ndyr       4575 Feb  9 22:11 mystery1.script
+-rw-------   1 swatso33 2ndyr          0 Feb  9 22:12 mystery1.txt
+-rw-------   1 swatso33 2ndyr       2556 Feb  9 22:18 mystery2.script
+obelix[16]% gdb buggy
+GNU gdb 6.6
+Copyright (C) 2006 Free Software Foundation, Inc.
+GDB is free software, covered by the GNU General Public License, and you are
+welcome to change it and/or distribute copies of it under certain conditions.
+Type "show copying" to see the conditions.
+There is absolutely no warranty for GDB.  Type "show warranty" for details.
+This GDB was configured as "sparc-sun-solaris2.8"...
+(gdb) display /i $pc
+(gdb) display /x $l0
+(gdb) break main
+Breakpoint 1 at 0x10740
+(gdb) r
+Starting program: /student/swatso33/courses/cs2208/assignments/asn2/buggy 
+warning: Temporarily disabling breakpoints for unloaded shared library "/usr/lib/ld.so.1"
+
+Breakpoint 1, 0x00010740 in main ()
+2: /x $l0 = 0x0
+1: x/i $pc  0x10740 <main+4>:	mov  4, %l0
+(gdb) ni
+0x00010744 in loop1 ()
+2: /x $l0 = 0x4
+1: x/i $pc  0x10744 <loop1>:	deccc  %l0
+(gdb) 
+0x00010748 in loop1 ()
+2: /x $l0 = 0x3
+1: x/i $pc  0x10748 <loop1+4>:	bg  0x10744 <loop1>
+(gdb) 
+0x0001074c in loop1 ()
+2: /x $l0 = 0x3
+1: x/i $pc  0x1074c <loop1+8>:	inc  %l0
+(gdb) 
+0x00010744 in loop1 ()
+2: /x $l0 = 0x4
+1: x/i $pc  0x10744 <loop1>:	deccc  %l0
+(gdb) 
+0x00010748 in loop1 ()
+2: /x $l0 = 0x3
+1: x/i $pc  0x10748 <loop1+4>:	bg  0x10744 <loop1>
+(gdb) 
+0x0001074c in loop1 ()
+2: /x $l0 = 0x3
+1: x/i $pc  0x1074c <loop1+8>:	inc  %l0
+(gdb) 
+0x00010744 in loop1 ()
+2: /x $l0 = 0x4
+1: x/i $pc  0x10744 <loop1>:	deccc  %l0
+(gdb) 
+0x00010748 in loop1 ()
+2: /x $l0 = 0x3
+1: x/i $pc  0x10748 <loop1+4>:	bg  0x10744 <loop1>
+(gdb) 
+0x0001074c in loop1 ()
+2: /x $l0 = 0x3
+1: x/i $pc  0x1074c <loop1+8>:	inc  %l0
+(gdb) 
+0x00010744 in loop1 ()
+2: /x $l0 = 0x4
+1: x/i $pc  0x10744 <loop1>:	deccc  %l0
+(gdb) quit
+The program is running.  Exit anyway? (y or n) n
+Not confirmed.
+(gdb) quit
+The program is running.  Exit anyway? (y or n) y
+obelix[17]% exit
+exit
+
+script done on Thu Feb 09 22:28:37 2012

@@ -1,0 +1,21 @@
+30
+10
+9
+0
+o-o-o o-o o-o-o o o
+| v |   | | |   | |
+o-s-o-o-o o-o-o-o-o
+  v |   | |   |    
+o-o-o o o-o-oho-o o
+|   v   v   |   |  
+o-o-o-o o-o o o-o-o
+    v   | |   | v  
+o-o o-oho o-o o-o-o
+| |   |   v |   | |
+o-o-o-o o o-o-o-o o
+|     | | |   v   |
+o-o oho-o-o-o-o o-o
+    | |   v   |   |
+o-o-o-o-o-o o-o o-o
+| |   v |   |   | |
+o o o-o-e-o-o o-o o

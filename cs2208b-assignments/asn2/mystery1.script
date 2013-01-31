@@ -1,0 +1,154 @@
+Script started on Thu Feb 09 22:09:18 2012
+obelix[11]% pwd
+/student/swatso33/courses/cs2208/assignments/asn2
+obelix[12]% date
+Thu Feb  9 22:09:28 EST 2012
+obelix[13]% whoami
+swatso33
+obelix[14]% ls -lt
+total 73
+-rw-------   1 swatso33 2ndyr          0 Feb  9 22:09 mystery1.out
+-rwx------   1 swatso33 2ndyr       8552 Feb  9 21:56 mystery*
+-rw-------   1 swatso33 2ndyr        508 Feb  9 21:55 mystery.s
+-rwx------   1 swatso33 2ndyr       8800 Feb  9 20:24 asn2*
+-rw-------   1 swatso33 2ndyr        364 Feb  9 20:24 buggy.s
+-rw-------   1 swatso33 2ndyr       3324 Feb  9 20:24 iofunc.o
+-rw-------   1 swatso33 2ndyr       4689 Feb  9 20:20 asn2.s
+-rw-------   1 swatso33 2ndyr       5193 Feb  9 20:19 asn2.m
+obelix[15]% gcc -o mystery mystery.s
+obelix[16]% ls -lt
+total 73
+-rwx------   1 swatso33 2ndyr       5772 Feb  9 22:10 mystery*
+-rw-------   1 swatso33 2ndyr          0 Feb  9 22:09 mystery1.out
+-rw-------   1 swatso33 2ndyr        508 Feb  9 21:55 mystery.s
+-rwx------   1 swatso33 2ndyr       8800 Feb  9 20:24 asn2*
+-rw-------   1 swatso33 2ndyr        364 Feb  9 20:24 buggy.s
+-rw-------   1 swatso33 2ndyr       3324 Feb  9 20:24 iofunc.o
+-rw-------   1 swatso33 2ndyr       4689 Feb  9 20:20 asn2.s
+-rw-------   1 swatso33 2ndyr       5193 Feb  9 20:19 asn2.m
+obelix[17]% gdb mystery
+GNU gdb 6.6
+Copyright (C) 2006 Free Software Foundation, Inc.
+GDB is free software, covered by the GNU General Public License, and you are
+welcome to change it and/or distribute copies of it under certain conditions.
+Type "show copying" to see the conditions.
+There is absolutely no warranty for GDB.  Type "show warranty" for details.
+This GDB was configured as "sparc-sun-solaris2.8"...
+(no debugging symbols found)
+(gdb) display /i $pc
+(gdb) display /x $l2
+(gdb) display /x $l1
+(gdb) display /x $l0
+(gdb) break main
+Breakpoint 1 at 0x1062c
+(gdb) r
+Starting program: /student/swatso33/courses/cs2208/assignments/asn2/mystery 
+(no debugging symbols found)
+warning: Temporarily disabling breakpoints for unloaded shared library "/usr/lib/ld.so.1"
+(no debugging symbols found)
+(no debugging symbols found)
+
+Breakpoint 1, 0x0001062c in main ()
+4: /x $l0 = 0x0
+3: /x $l1 = 0xff392a00
+2: /x $l2 = 0xff3303d8
+1: x/i $pc  0x1062c <main+4>:	sethi  %hi(0xabffdc00), %l0
+(gdb) ni
+0x00010630 in main ()
+4: /x $l0 = 0xabffdc00
+3: /x $l1 = 0xff392a00
+2: /x $l2 = 0xff3303d8
+1: x/i $pc  0x10630 <main+8>:	or  %l0, 0x289, %l0	! 0xabffde89
+(gdb) 
+0x00010634 in main ()
+4: /x $l0 = 0xabffde89
+3: /x $l1 = 0xff392a00
+2: /x $l2 = 0xff3303d8
+1: x/i $pc  0x10634 <main+12>:	mov  %g0, %l1
+(gdb) 
+0x00010638 in ckpt1 ()
+4: /x $l0 = 0xabffde89
+3: /x $l1 = 0x0
+2: /x $l2 = 0xff3303d8
+1: x/i $pc  0x10638 <ckpt1>:	sll  %l0, 0x18, %l2
+(gdb) 
+0x0001063c in ckpt1 ()
+4: /x $l0 = 0xabffde89
+3: /x $l1 = 0x0
+2: /x $l2 = 0x89000000
+1: x/i $pc  0x1063c <ckpt1+4>:	add  %l2, %l1, %l1
+(gdb) 
+0x00010640 in ckpt2 ()
+4: /x $l0 = 0xabffde89
+3: /x $l1 = 0x89000000
+2: /x $l2 = 0x89000000
+1: x/i $pc  0x10640 <ckpt2>:	srl  %l0, 8, %l2
+(gdb) 
+0x00010644 in ckpt2 ()
+4: /x $l0 = 0xabffde89
+3: /x $l1 = 0x89000000
+2: /x $l2 = 0xabffde
+1: x/i $pc  0x10644 <ckpt2+4>:	sll  %l2, 0x18, %l2
+(gdb) 
+0x00010648 in ckpt2 ()
+4: /x $l0 = 0xabffde89
+3: /x $l1 = 0x89000000
+2: /x $l2 = 0xde000000
+1: x/i $pc  0x10648 <ckpt2+8>:	srl  %l2, 8, %l2
+(gdb) 
+0x0001064c in ckpt2 ()
+4: /x $l0 = 0xabffde89
+3: /x $l1 = 0x89000000
+2: /x $l2 = 0xde0000
+1: x/i $pc  0x1064c <ckpt2+12>:	add  %l2, %l1, %l1
+(gdb) 
+0x00010650 in ckpt3 ()
+4: /x $l0 = 0xabffde89
+3: /x $l1 = 0x89de0000
+2: /x $l2 = 0xde0000
+1: x/i $pc  0x10650 <ckpt3>:	srl  %l0, 0x10, %l2
+(gdb) 
+0x00010654 in ckpt3 ()
+4: /x $l0 = 0xabffde89
+3: /x $l1 = 0x89de0000
+2: /x $l2 = 0xabff
+1: x/i $pc  0x10654 <ckpt3+4>:	sll  %l2, 0x18, %l2
+(gdb) 
+0x00010658 in ckpt3 ()
+4: /x $l0 = 0xabffde89
+3: /x $l1 = 0x89de0000
+2: /x $l2 = 0xff000000
+1: x/i $pc  0x10658 <ckpt3+8>:	srl  %l2, 0x10, %l2
+(gdb) 
+0x0001065c in ckpt3 ()
+4: /x $l0 = 0xabffde89
+3: /x $l1 = 0x89de0000
+2: /x $l2 = 0xff00
+1: x/i $pc  0x1065c <ckpt3+12>:	add  %l2, %l1, %l1
+(gdb) 
+0x00010660 in ckpt4 ()
+4: /x $l0 = 0xabffde89
+3: /x $l1 = 0x89deff00
+2: /x $l2 = 0xff00
+1: x/i $pc  0x10660 <ckpt4>:	srl  %l0, 0x18, %l2
+(gdb) 
+0x00010664 in ckpt4 ()
+4: /x $l0 = 0xabffde89
+3: /x $l1 = 0x89deff00
+2: /x $l2 = 0xab
+1: x/i $pc  0x10664 <ckpt4+4>:	add  %l2, %l1, %l1
+(gdb) 
+0x00010668 in ckpt5 ()
+4: /x $l0 = 0xabffde89
+3: /x $l1 = 0x89deffab
+2: /x $l2 = 0xab
+1: x/i $pc  0x10668 <ckpt5>:	ret 
+(gdb) c
+Continuing.
+
+Program exited with code 01.
+(gdb) quit
+obelix[18]% exit
+exit
+
+script done on Thu Feb 09 22:11:20 2012

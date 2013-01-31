@@ -1,0 +1,102 @@
+Script started on Thu Feb 09 22:17:04 2012
+obelix[11]% pwd
+/student/swatso33/courses/cs2208/assignments/asn2
+obelix[12]% date
+Thu Feb  9 22:17:09 EST 2012
+obelix[13]% whoami
+swatso33
+obelix[14]% gdb mystery
+GNU gdb 6.6
+Copyright (C) 2006 Free Software Foundation, Inc.
+GDB is free software, covered by the GNU General Public License, and you are
+welcome to change it and/or distribute copies of it under certain conditions.
+Type "show copying" to see the conditions.
+There is absolutely no warranty for GDB.  Type "show warranty" for details.
+This GDB was configured as "sparc-sun-solaris2.8"...
+(no debugging symbols found)
+(gdb) display /i $pc
+(gdb) display /x $l2
+(gdb) display /x $l1
+(gdb) display /x $l1
+(gdb) display /x $l0
+(gdb) break main
+Breakpoint 1 at 0x1062c
+(gdb) break ckpt1
+Breakpoint 2 at 0x10638
+(gdb) break ckpt2
+Breakpoint 3 at 0x10640
+(gdb) break ckpt3
+Breakpoint 4 at 0x10650
+(gdb) break ckpt4
+Breakpoint 5 at 0x10660
+(gdb) break ckpt5
+Breakpoint 6 at 0x10668
+(gdb) ccrun
+Undefined command: "ccrun".  Try "help".
+(gdb) r
+Starting program: /student/swatso33/courses/cs2208/assignments/asn2/mystery 
+(no debugging symbols found)
+warning: Temporarily disabling breakpoints for unloaded shared library "/usr/lib/ld.so.1"
+(no debugging symbols found)
+(no debugging symbols found)
+
+Breakpoint 1, 0x0001062c in main ()
+5: /x $l0 = 0x0
+4: /x $l1 = 0xff392a00
+3: /x $l1 = 0xff392a00
+2: /x $l2 = 0xff3303d8
+1: x/i $pc  0x1062c <main+4>:	sethi  %hi(0xabffdc00), %l0
+(gdb) c
+Continuing.
+
+Breakpoint 2, 0x00010638 in ckpt1 ()
+5: /x $l0 = 0xabffde89
+4: /x $l1 = 0x0
+3: /x $l1 = 0x0
+2: /x $l2 = 0xff3303d8
+1: x/i $pc  0x10638 <ckpt1>:	sll  %l0, 0x18, %l2
+(gdb) c
+Continuing.
+
+Breakpoint 3, 0x00010640 in ckpt2 ()
+5: /x $l0 = 0xabffde89
+4: /x $l1 = 0x89000000
+3: /x $l1 = 0x89000000
+2: /x $l2 = 0x89000000
+1: x/i $pc  0x10640 <ckpt2>:	srl  %l0, 8, %l2
+(gdb) c
+Continuing.
+
+Breakpoint 4, 0x00010650 in ckpt3 ()
+5: /x $l0 = 0xabffde89
+4: /x $l1 = 0x89de0000
+3: /x $l1 = 0x89de0000
+2: /x $l2 = 0xde0000
+1: x/i $pc  0x10650 <ckpt3>:	srl  %l0, 0x10, %l2
+(gdb) c
+Continuing.
+
+Breakpoint 5, 0x00010660 in ckpt4 ()
+5: /x $l0 = 0xabffde89
+4: /x $l1 = 0x89deff00
+3: /x $l1 = 0x89deff00
+2: /x $l2 = 0xff00
+1: x/i $pc  0x10660 <ckpt4>:	srl  %l0, 0x18, %l2
+(gdb) c
+Continuing.
+
+Breakpoint 6, 0x00010668 in ckpt5 ()
+5: /x $l0 = 0xabffde89
+4: /x $l1 = 0x89deffab
+3: /x $l1 = 0x89deffab
+2: /x $l2 = 0xab
+1: x/i $pc  0x10668 <ckpt5>:	ret 
+(gdb) c
+Continuing.
+
+Program exited with code 01.
+(gdb) quit
+obelix[15]% exit
+exit
+
+script done on Thu Feb 09 22:18:24 2012

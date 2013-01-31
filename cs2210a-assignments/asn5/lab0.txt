@@ -1,0 +1,9 @@
+50
+5
+3
+0
+s-o o-o-o
+| v v | v
+o-o-o-oho
+v |   v |
+o-o-o-e-o

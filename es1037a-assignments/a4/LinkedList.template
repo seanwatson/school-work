@@ -1,0 +1,162 @@
+// An implementation of templated class "LinkedList"
+
+#include "cs1037assert.h"  // Our alternative to #include <cassert>  
+
+ template <class Item>
+ LinkedList<Item> :: LinkedList( ) 
+ : m_head (NULL)
+ , m_tail (NULL)
+ , m_size (0) 
+ {}
+ 
+template <class Item>
+LinkedList<Item> :: ~LinkedList( ) 
+{
+     Node * here = m_head, * nextNode;
+     while ( here != NULL ) 
+     {
+         nextNode = here->next;
+         delete here;
+         here = nextNode;
+     }
+}   
+
+template <class Item> 
+unsigned int LinkedList<Item> :: size( ) const 
+{
+     return m_size;
+}
+ 
+template <class Item>
+bool LinkedList<Item> :: isEmpty( ) const 
+{
+     return ( m_size == 0 );
+} 
+
+template <class Item>
+void LinkedList<Item> :: addHead( Item item ) 
+ {
+     m_head = new Node(item, m_head);
+     if (m_tail == NULL) m_tail = m_head;
+     m_size++;
+}   
+
+template <class Item>
+Item LinkedList<Item> :: removeHead( ) 
+{
+     // PRECONDITION: list is not already empty
+     Assert(!isEmpty(),"LinkedList is Empty (in removeHead)");
+     Node * oldNode = m_head;
+     Item returnVal = m_head->value;
+     m_head = m_head->next;
+     if (m_head == NULL) m_tail = NULL;
+     m_size--;
+     delete oldNode;
+     return returnVal;
+}
+                                                                                                                                                                                                                                                                               
+template <class Item>
+Item LinkedList<Item>::retrieveHead( ) const 
+{
+     // PRECONDITION: list is not already empty
+     Assert(!isEmpty(),"LinkedList is Empty (in retrieveHead)");
+     return m_head->value;
+}
+
+template <class Item>
+void LinkedList<Item> :: addTail( Item item ) 
+{
+     if ( isEmpty( ) ) addHead( item );
+     else 
+     {
+         m_tail = m_tail->next = new Node(item);
+         m_size++; 
+     }
+}
+
+template <class Item>
+Item LinkedList<Item> :: removeTail( ) 
+{
+     // PRECONDITION: list is not already empty
+     Assert(!isEmpty(),"LinkedList is Empty (in removeTail)");
+     if ( m_head == m_tail ) return removeHead( );
+     Item returnVal = m_tail->value;
+     Node * preTail = m_head;
+     while ( preTail->next != m_tail )
+         preTail = preTail->next;
+     preTail->next =  NULL;
+     delete m_tail;
+     m_tail = preTail;
+     m_size--;
+     return returnVal;
+}
+
+template <class Item>
+Item LinkedList<Item> :: retrieveTail( ) const 
+{
+     // PRECONDITION: list is not already empty
+     Assert(!isEmpty(),"LinkedList is Empty (in retrieveTail)");
+     return m_tail->value;
+}
+
+template <class Item>
+void LinkedList<Item> :: add( unsigned int n, Item item ) 
+{
+     // PRECONDITION: n should be a valid position in the list
+     Assert( (n >= 1) && (n <= size()+1),"LinkedList index is out of bounds (in add)" ); 
+     if      ( n == 1 )          addHead( item );
+     else if ( n == (size()+1) ) addTail( item );           
+     else 
+     {
+         Node * here = m_head;
+         for (unsigned int k = 1; k < n-1; k++ )
+             here = here->next;
+         here->next = new Node(item,here->next);
+         m_size++;
+     }
+} 
+
+template <class Item>
+Item LinkedList<Item> :: replace( unsigned int n, Item item ) 
+{
+     // PRECONDITION: n must be a valid current list position
+     Assert( (n >= 1) && (n <= size()),"LinkedList index is out of bounds (in replace)" );  
+     Item returnValue;
+     node * here = m_head;
+     for (unsigned int k = 1; k < n; k++) 
+         here = here->next;
+     returnValue = here->value; 
+     here->value = item;
+     return returnValue;    
+}
+ 
+template <class Item>
+Item LinkedList<Item> :: remove( unsigned int n ) 
+{
+     // PRECONDITION: n must be a valid current list position
+     Assert( (n >= 1) && (n <= size()),"LinkedList index is out of bounds (in remove)" );  
+     if (n == 1) return removeHead( );
+     if (n == size( )) return removeTail( );
+	 
+     Node * here = m_head;
+     for (unsigned int k = 1; k < n-1; k++ )
+         here = here->next;
+     Node * kill = here->next;
+     Item returnVal = kill->value;
+     here->next = kill->next;
+     delete kill;
+     m_size--;
+     return returnVal;
+}
+
+template <class Item>
+Item LinkedList<Item> :: retrieve( unsigned int n ) const 
+{
+     // PRECONDITION: n must be a valid current list position
+     Assert( (n >= 1) && (n <= size()),"LinkedList index is out of bounds (in retrieve)" );  
+     if (n == 1) return retrieveHead( );
+     if (n == size( )) return retrieveTail( );
+     Node * here = m_head;
+     for (unsigned int k = 1; k < n; k++ ) here = here->next;
+     return here->value;
+}

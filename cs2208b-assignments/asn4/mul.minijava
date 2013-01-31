@@ -1,0 +1,45 @@
+iconst_0
+istore 1
+bipush 33
+istore 4
+iread
+istore 0
+iread
+istore 2
+iload 4
+bipush 1
+isub
+dup
+istore 4
+ifeq 53
+iload 2
+bipush 1
+iand
+ifeq 10
+iload 0
+iload 1
+iadd
+istore 1
+bipush 1
+iload 2
+iushr
+istore 2
+iload 1
+bipush 1
+iand
+ifeq 13
+iload 2
+bipush 31
+bipush 1
+ishl
+ior
+istore 2
+bipush 1
+iload 1
+ishr
+istore 1
+goto -58
+iload 2
+iprint
+pop
+return

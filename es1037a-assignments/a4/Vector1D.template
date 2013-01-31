@@ -1,0 +1,197 @@
+// An implementation of templated class "Vector1D"
+
+#include "cs1037assert.h"  // Our alternative to #include <cassert>  
+
+
+template <class T>
+Vector1D<T> :: Vector1D() 
+: m_container(NULL), m_width(0){} 
+
+template <class T>
+Vector1D<T> :: Vector1D(unsigned width) 
+: m_container(NULL) {resize(width);} 
+
+template <class T>
+Vector1D<T> :: Vector1D(unsigned width, T val) 
+: m_container(NULL) {reset(width,val);} 
+
+template <class T> // copy constructor
+Vector1D<T> :: Vector1D(const Vector1D<T>& src) 
+: m_container(NULL) { 
+    resize(src.m_width);
+    for (unsigned i=0; i<m_width; i++) m_container[i] = src.m_container[i];
+}
+
+template <class T> template <class type>
+Vector1D<T> :: Vector1D(const Vector1D<type>& src) // conversion constructor (by casting)
+: m_container(NULL) {
+    resize(src.getWidth());
+    if (!isEmpty()) for (unsigned x=0; x<m_width; x++) m_container[x] = (T) src[x];
+}
+
+template <class T>
+Vector1D<T>&  Vector1D<T> :: operator=(const Vector1D<T>& src) // copy operator
+{
+    resize(src.m_width);
+    if (!isEmpty()) for (unsigned i=0; i<m_width; i++) m_container[i] = src.m_container[i];
+    return *this;
+}
+
+template <class T> template <class type>       
+Vector1D<T>& Vector1D<T> :: operator=(const Vector1D<type>& src)   // conversion operator (by casting)
+{
+    resize(src.getWidth());
+    if (!isEmpty()) for (unsigned x=0; x<m_width; x++) m_container[x] = (T) src[x];
+    return *this;
+}
+
+template <class T>
+Vector1D<T> :: ~Vector1D() {if (m_container) delete[] m_container;}
+
+
+template <class T>
+T& Vector1D<T> :: operator[](unsigned x) const
+{
+    Assert( x<m_width, "Vector1D index is out of bounds (in operator[](unsigned x))" );
+    return m_container[x];
+}
+
+template <class T>
+T& Vector1D<T> :: operator[](int x) const
+{
+    Assert(0<=x && ((unsigned)x)<m_width,"Vector1D index is out of bounds (in operator[](int x))");
+    return m_container[(unsigned)x];
+}
+
+template <class T>
+Vector1D<T>& Vector1D<T> :: resize(unsigned width) 
+{
+    if (m_container) delete m_container;
+    m_width = width;
+    if (m_width==0) m_container=NULL; 
+    else m_container = new T[m_width];
+    return (*this);
+}
+
+template <class T>
+Vector1D<T>& Vector1D<T> :: reset(T val) 
+{ 
+    if (m_container) for (unsigned i=0; i<m_width; i++) m_container[i] = val; 
+    return (*this);
+}
+
+template <class T> 
+T Vector1D<T> :: getMin() const
+{
+    Assert(!isEmpty(),"empty vector (in getMin)");
+    T current_min = m_container[0];
+    for (unsigned i=1; i<m_width; i++) if (m_container[i] < current_min) current_min = m_container[i]; 
+    return current_min;
+}
+
+template <class T> 
+T Vector1D<T> :: getMax() const
+{
+    Assert(!isEmpty(),"empty vector (in getMax)");
+    T current_max = m_container[0];
+    for (unsigned i=1; i<m_width; i++) if (m_container[i] > current_max) current_max = m_container[i]; 
+    return current_max;
+}
+
+
+template <class T>
+Vector1D<T>& Vector1D<T> :: operator+=(const Vector1D<T>& arg)
+{
+    Assert( m_width==arg.getWidth(),"Vector1D of different size (in operator+=)");
+    for (unsigned i=0; i<m_width; i++) m_container[i] += arg.m_container[i];
+    return (*this);
+}
+
+template <class T>
+Vector1D<T>& Vector1D<T> :: operator-=(const Vector1D<T>& arg) // subtracting another Vector1D
+{
+    Assert( m_width==arg.getWidth(),"Vector1D of different size (in operator-=)");
+    for (unsigned i=0; i<m_width; i++) m_container[i] -= arg.m_container[i];
+    return (*this);
+}
+
+template <class T>
+Vector1D<T>& Vector1D<T> :: operator+=(const T& val)
+{
+    for (unsigned i=0; i<m_width; i++) m_container[i] += val;
+    return (*this);
+}
+
+template <class T>
+Vector1D<T>& Vector1D<T> :: operator-=(const T& val)
+{
+    for (unsigned i=0; i<m_width; i++) m_container[i] -= val;
+    return (*this);
+}
+
+template <class T>
+Vector1D<T>& Vector1D<T> :: operator*=(const double& scalar) 
+{
+    for (unsigned i=0; i<m_width; i++) m_container[i] *= scalar;
+    return (*this);
+}
+
+template <class T>
+Vector1D<T>& Vector1D<T> :: operator%=(const Vector1D<double>& s)
+{
+    Assert( m_width==arg.getWidth(),"Vector1D of different size (in point_prod)");
+    for (unsigned i=0; i<m_width; i++) m_container[i] *= arg.m_container[i];
+    return (*this);
+}
+
+template <class T> template <class type>
+void Vector1D<T> :: convertTo(Vector1D<type>& trg, type (*f)(T item)) const
+{
+    trg.resize(m_width);
+    if (!trg.isEmpty()) for (unsigned x=0; x<m_width; x++) trg[x]=f(m_container[x]); 
+}
+
+template <class T> template<class type, class Conversion>
+void Vector1D<T> :: convertTo(Vector1D<type>& trg, const Conversion& f) const 
+{
+    trg.resize(m_width,m_height);
+    if (!trg.isEmpty()) for (unsigned x=0; x<m_width; x++) f.convert(trg[x],m_container[x]);
+}
+
+template <class T> template <class type>
+void Vector1D<T> :: convertTo(Vector1D<type>& trg, const double new_min, const double new_max) const
+{
+    if (isEmpty()) trg.resize(getWidth());
+    double old_min = (double)getMin();
+    double old_max = (double)getMax();
+    double gain = 1;
+    double bias = (new_min+new_max)/2.0-old_min;
+    if (old_min!=old_max) {
+        gain = (new_max-new_min)/(old_max-old_min); 
+        bias=new_min-old_min*gain;
+    }
+    convertTo(trg,Scaling(gain,bias));
+}
+
+template <class type, class T> 
+Vector1D<type> convert(const Vector1D<T>& src, type (*f) (T)) 
+{
+    Vector1D<type> result;
+    src.convertTo(result,f);
+    return result;
+}
+
+template <class type, class T, class Conversion>  
+Vector1D<type> convert(const Vector1D<T>& src, const Conversion& f) 
+{
+    Vector1D<type> result;
+    src.convertTo(result,f);
+    return result;
+}
+
+template <class type, class T>
+Vector1D<type> convert(const Vector1D<T>& src, const double new_min, const double new_max) {
+    Vector1D<type> result;
+    src.convertTo(result,new_min,new_max);
+    return result;
+}

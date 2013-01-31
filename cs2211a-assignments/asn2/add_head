@@ -1,0 +1,40 @@
+#!/bin/sh
+
+files=`ls -A *.c`							# find all the files that end in .c
+for i in $files								# check each of the found files
+do
+	if [ -f "$i" ]; then						# check if it exists and isnt a directory
+		if grep '\<printf\>' "$i" >/dev/null			# look for printf
+		then
+
+			if grep "^#include <stdio.h>$" "$i" >/dev/null 	# if it is found, look for header
+			then
+				echo "$i already contains header"
+			else
+				echo '#include <stdio.h>' > /tmp/addhead # if no header, add it
+				cat "$i" >> /tmp/addhead
+				cp /tmp/addhead "$i"
+				echo "Header added to $i"
+			fi
+
+		elif grep '\<fprintf\>' "$i" >/dev/null			# look for fprintf
+		then
+
+			if grep "^#include <stdio.h>$" "$i" >/dev/null	# look for header
+			then
+				echo "$i already contains a header"
+			
+			else
+				echo '#include <stdio.h>' > /tmp/addhead # if no header, add it
+				cat "$i" >> /tmp/addhead
+				cp /tmp/addhead "$i"
+				echo "Header added to $i"
+			fi
+		
+		else
+			echo "$i doesnt need a header"
+		
+		fi
+	fi
+done
+echo 'Done'

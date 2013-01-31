@@ -1,0 +1,13 @@
+#!/bin/sh
+
+echo $0						# print the name of the program
+count=1
+for i in $*					# go through each paramater
+do
+	if [ `expr $count % 2` -eq 0 ]; then	# check if the current parameter is odd
+		:				# if it is even do nothing
+	else
+		echo $i				# if it is odd print it
+	fi
+	count=`expr $count + 1`			# increment the paramater number counter
+done

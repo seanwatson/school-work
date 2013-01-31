@@ -1,0 +1,61 @@
+// An implementation of templated class "Bag"
+
+#include <stdlib.h> // for rand()
+#include <cassert>  // for assert()
+
+// constructor builds a bag with the ability to hold
+// max_capacity Items; the bag is initially empty 
+template <class Item>
+Bag<Item> :: Bag(unsigned int max_capacity) {
+    m_max_capacity = max_capacity;
+    m_size = 0;
+    m_container = new Item [m_max_capacity];
+}
+
+// destructor destroys the bag by recycling the memory it used
+template <class Item>
+Bag<Item> :: ~Bag( ) {
+    delete [ ] m_container;
+}
+
+// Add the Item value to the bag, if there’s room. 
+// PRECONDITION: the bag must not be "full"
+template <class Item>
+void Bag<Item> :: add(Item value) {
+    assert(!isFull());
+    m_container[m_size] = value; // store the pointer 
+    m_size++;
+}
+
+// Removes an Item at random from the bag and return it; 
+// PRECONDITION: the bag must not be empty when "getOne()" is called
+template <class Item>
+Item Bag<Item> :: getOne( ) {
+    assert(!isEmpty());
+    //generate a random number between 0 and (m_size-1);
+    unsigned int index = (unsigned int)( rand( ) % m_size);  
+    Item value = m_container[index];  
+    m_container[index] = m_container[m_size-1]; 
+    m_size--;
+    return value;                                 
+}
+
+template <class Item>
+bool Bag<Item> :: isEmpty( ) const {
+    return (m_size == 0);
+}
+
+template <class Item>
+bool Bag<Item> :: isFull( ) const {
+    return (m_size == m_max_capacity);
+}
+
+template <class Item>
+unsigned int Bag<Item> :: currentSize( ) const {
+    return m_size;
+}
+
+template <class Item>
+unsigned int Bag<Item> :: capacity( ) const {
+    return m_max_capacity;
+}

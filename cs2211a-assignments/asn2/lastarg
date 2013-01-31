@@ -1,0 +1,14 @@
+#!/bin/sh
+
+if [ $# -eq 0 ]; then		# check if there are arguments
+:				# if no arguments, do nothing
+
+else	
+
+	while [ $# -gt 1 ]	# while there is more than one argument
+	do
+		shift		# shift all the arguments to the left
+	done
+	echo $1			# print the remaining argument
+
+fi

@@ -1,0 +1,454 @@
+// An implementation of templated "Operators" 
+// for classes Table2D, Vector2D, and Kernel2D
+
+#include "cs1037assert.h"  // Our alternative to #include <cassert>  
+
+
+template <class T>
+Table2D<T> operator*(const Table2D<T>& a, const double& scalar)
+{
+    Table2D<T> result( a );
+    return  result*= scalar;
+}
+
+template <class T>
+Table2D<T> operator*(const double& scalar, const Table2D<T>& a)
+{
+    Table2D<T> result( a );
+    return  result*= scalar;
+}
+
+template <class T>
+Table2D<T> operator+(const Table2D<T>& a, const double& val)
+{
+    Table2D<T> result( a );
+    return  result+= (T) val;
+}
+
+template <class T>
+Table2D<T> operator+(const double& val, const Table2D<T>& a)
+{
+    Table2D<T> result( a );
+    return  result+= (T) val;
+}
+
+template <class T>
+Table2D<T> operator-(const Table2D<T>& a, const double& val) 
+{
+    Table2D<T> result( a );
+    return  result-= (T) val;
+}
+
+template <class T>
+Table2D<T> operator-(const double& val, const Table2D<T>& a) 
+{
+    Table2D<T> result(a.getWidth(), a.getHeight(), (T) val);
+    return  result-= a;
+}
+
+template <class T>
+Table2D<T> operator+(const Table2D<T>& a, const Table2D<T>& b)
+{
+    Assert( a.getWidth()==b.getWidth() && a.getHeight()==b.getHeight(),"Adding 2 arrays of different size (in operator+)");
+    Table2D<T> result( a );
+    return  result+=b;
+}
+
+template <class T>
+Table2D<T> operator-(const Table2D<T>& a, const Table2D<T>& b)
+{
+    Assert( a.getWidth()==b.getWidth() && a.getHeight()==b.getHeight(),"Adding 2 arrays of different size (in operator-)");
+    Table2D<T> result( a );
+    return  result-=b;
+}
+
+template <class T>
+Table2D<T> operator*(const Table2D<T>& a, const Table2D<T>& b)
+{    
+    Assert(!a.isEmpty() && !b.isEmpty(),"an empty matrix (in operator*)");
+    Assert(a.getWidth()==b.getHeight(),"a.width is not equal to b.height (in operator*)");
+    Table2D<T> result( b.getWidth(), a.getHeight() );
+    for (int x=0; x<result.getWidth(); x++) for (int y=0; y<result.getHeight(); y++) {
+        result[x][y] = a[0][y]*b[x][0];
+        for (int t=1; t<a.getWidth(); t++) result[x][y]  += a[t][y]*b[x][t];
+    }
+    return  result;
+}
+
+template <class T>
+Table2D<T> operator%(const Table2D<T>& a, const Table2D<double>& s)
+{
+    Assert( a.getWidth()==s.getWidth() && a.getHeight()==s.getHeight(),"POINTWISE multiplication of 2 arrays of different size (in point_prod)");
+    Table2D<T> result( a );
+    return  result%=s;
+} 
+
+template <class T, class K> // matrix convolution
+Table2D<T> operator*(const Table2D<T>& a, const Kernel2D<K>& kernel)
+{  
+    int i,j, w=a.getWidth(), h=a.getHeight();
+    unsigned x,y;
+    int leftK = kernel.left(),  rightK = kernel.right();
+    int topK  = kernel.top(),   botK   = kernel.bottom();
+    int   le  = rightK,         ri     = (w+leftK-1);
+    int   to  = botK,           bo     = (h+topK-1);
+    unsigned  leftA  = (le>0) ? ((le<w) ? le : (w-1) ) : 0;
+    unsigned  rightA = (ri>0) ? ((ri<w) ? ri : (w-1) ) : 0;
+    unsigned  topA   = (to>0) ? ((to<h) ? to : (h-1) ) : 0;
+    unsigned  botA   = (bo>0) ? ((bo<h) ? bo : (h-1) ) : 0;
+    
+    Assert(kernel.getWidth()<=a.getWidth() && kernel.getHeight()<=a.getHeight(),"kernel is bigger than array (in convolution operator*)");
+    Assert(!kernel.isEmpty(),"kernel is empty (in convolution operator*)");  
+    Table2D<T> result( a.getWidth(), a.getHeight(), 0);   // "0" must make sense for type "T"
+    for (x=leftA; x<=rightA; x++) 
+    {
+        T* res_column = result[x]; // pointer to pixel result[x][0] (see Table2D.h)
+        for (y=topA; y<=botA; y++)    // and now arr_column[y] is same as "arr[x][y] 
+        {
+            T tmp = 0;
+            for (i=leftK; i<=rightK; i++) 
+            {
+                 T*  a_column  = a[x-i];     // pointer to pixel a[x-i][0]
+                 K* ker_column = kernel[i];  // pointer to pixel kernel[i][0] 
+                 for (j=topK; j<=botK; j++)  // NOTE: operation "T=T*K"  MUST be defined!!!
+                     tmp += (a_column[y-j] * ker_column[j]); 
+            }
+            res_column[y] = tmp;
+        }
+    }    
+    return result;
+}
+
+template <class T, class K> // basic normallized cross-correlation (NCC) - OK for small kernels 
+Table2D<T> operator%(const Table2D<T>& a, const Kernel2D<K>& kernel) // faster code for bigger kernels (templates) could be found, e.g. see J.P. Lewis
+{  
+    int i,j, w=a.getWidth(), h=a.getHeight();
+    unsigned x,y;
+    int leftK = kernel.left(),  rightK = kernel.right();
+    int  topK = kernel.top(),     botK = kernel.bottom();
+    int    le = (-leftK),           ri = (w-rightK-1);
+    int    to = (-topK),            bo = (h-botK-1);
+    unsigned  leftA  = (le>0) ? ((le<w) ? le : (w-1) ) : 0;
+    unsigned  rightA = (ri>0) ? ((ri<w) ? ri : (w-1) ) : 0;
+    unsigned  topA   = (to>0) ? ((to<h) ? to : (h-1) ) : 0;
+    unsigned  botA   = (bo>0) ? ((bo<h) ? bo : (h-1) ) : 0;
+   
+    Assert(kernel.getWidth()<=a.getWidth() && kernel.getHeight()<=a.getHeight(),"kernel is bigger than array (in convolution operator*)");
+    Assert(!kernel.isEmpty(),"kernel is empty (in convolution operator*)");  
+    int   kern_size = kernel.getWidth()*kernel.getHeight();
+    K kern_sum=0, kern_prod=0; 
+    for (i=leftK; i<=rightK; i++) for (j=topK; j<=botK; j++) {kern_sum+=kernel[i][j]; kern_prod+=(kernel[i][j]*kernel[i][j]);}
+    K kern_mean = kern_sum/kern_size;
+    K kern_div2 = kern_prod-(kern_sum*kern_mean);
+    
+    Table2D<T> result( a.getWidth(), a.getHeight(), 0);   // "0" must make sense for type "T"
+    for (x=leftA; x<=rightA; x++) 
+    {
+        T* res_column = result[x]; // pointer to pixel result[x][0] (see Table2D.h)
+        for (y=topA; y<=botA; y++)    // and now arr_column[y] is same as "arr[x][y] 
+        {
+            T tmp = 0, sum = 0, prod = 0, h;
+            for (i=leftK; i<=rightK; i++) 
+            {
+                 T*  a_column  = a[x+i];      // pointer to pixel a[x+i][0]
+                 K* ker_column = kernel[i];   // pointer to pixel kernel[i][0] 
+                 for (j=topK; j<=botK; j++) 
+                 {    // NOTE: operations "T=T*K" and "T=T*T" MUST be defined!!!
+                      h = a_column[y+j];
+                      tmp  += (h * ker_column[j]);
+                      prod += (h * a_column[y+j]);  
+                      sum  +=  h;
+                 }
+            }                        
+            res_column[y] = (tmp - sum*kern_mean)/sqrt(0.0000001+(prod-(sum*sum/kern_size))*kern_div2);
+        }
+    }    
+    return result;
+}
+
+template <class T>
+Vector1D<T> operator*(const Vector1D<T>& a, const double& scalar)
+{   
+    Vector1D<T> result( a );
+    return  result*= (T) scalar;
+}
+
+template <class T>
+Vector1D<T> operator*(const double& scalar, const Vector1D<T>& a)
+{   
+    Vector1D<T> result( a );
+    return  result*= (T) scalar;
+}
+
+template <class T>
+Vector1D<T> operator+(const Vector1D<T>& a, const double& val)
+{
+    Vector1D<T> result( a );
+    return  result+= (T) val;
+}
+
+template <class T>
+Vector1D<T> operator+(const double& val, const Vector1D<T>& a)
+{
+    Vector1D<T> result( a );
+    return  result+= (T) val;
+}
+
+template <class T>
+Vector1D<T> operator-(const Vector1D<T>& a, const double& val)
+{
+    Vector1D<T> result( a );
+    return  result-= (T) val;
+} 
+
+template <class T>
+Vector1D<T> operator-(const double& val, const Vector1D<T>& a)
+{
+    Vector1D<T> result( a.getWidth(), (T) val );
+    return  result-=a;
+} 
+
+template <class T>
+Vector1D<T> operator+(const Vector1D<T>& a, const Vector1D<T>& b)
+{
+    Assert( a.getWidth()==b.getWidth(),"Adding 2 vectors of different size (in operator+)");
+    Vector1D<T> result( a );
+    return  result+=b;
+}
+
+template <class T>
+Vector1D<T> operator-(const Vector1D<T>& a, const Vector1D<T>& b)
+{
+    Assert( a.getWidth()==b.getWidth(),"Adding 2 vectors of different size (in operator-)");
+    Vector1D<T> result( a );
+    return  result-=b;
+}
+
+template <class T>
+T operator*(const Vector1D<T>& a, const Vector1D<T>& b)
+{
+    Assert(!a.isEmpty() && !b.isEmpty(),"an empty vector (in dot-product operator*)");
+    Assert(a.getWidth()==b.getWidth(),"vector sizes are different (in dot-product operator*)");
+    T result = a[0]*b[0];
+    for (int x=1; x<a.getWidth(); x++) result  += a[x]*b[x];
+    return  result;
+} 
+
+template <class T>
+Vector1D<T> operator%(const Vector1D<T>& a, const Vector1D<double>& s)
+{
+    Assert( a.getWidth()==s.getWidth(),"POINTWISE multiplication of 2 vectors of different size (in point_prod)");
+    Vector1D<T> result( a );
+    return  result%=s;
+} 
+
+template <class T, class A>
+Vector1D<T> operator*(const Vector1D<T>& v, const Table2D<A>& a)
+{
+    Assert(a.getHeight()==v.getWidth(),"matrix height is not equal to vector size (in operator*)");
+    Vector1D<T> result( a.getWidth() );
+    for (int x=0; x<result.getWidth(); x++) {
+        result[x] = a[x][0]*v[0];
+        for (int y=1; y<a.getHeight(); y++) result[x]  += a[x][y]*v[y];
+    }
+    return  result;
+}
+
+template <class T, class A>
+Vector1D<T> operator*(const Table2D<A>& a, const Vector1D<T>& v)
+{
+    Assert(a.getWidth()==v.getWidth(),"matrix width is not equal to vector size (in operator*)");
+    Vector1D<T> result( a.getHeight() );
+    for (int y=0; y<result.getHeight(); y++) {
+        result[y] = a[0][y]*v[0];
+        for (int x=1; x<a.getWidth(); x++) result[y]  += a[x][y]*v[x];
+    }
+    return  result;
+}
+
+
+
+Table2D<double> grad2(const Table2D<double>& intensity) {return grad2(intensity,dX(),dY());}
+
+Table2D<double> grad2(const Table2D<double>& intensity, const Kernel2D<double>& dX, const Kernel2D<double>& dY)
+{
+    Assert(dX.getWidth()<=intensity.getWidth() && dX.getHeight()<=intensity.getHeight(),"kernel 'dX' is bigger than array 'intensity' (in grad2)");
+    Assert(!dX.isEmpty(),"kernel 'dX' is empty (in grad2)");  
+    Table2D<double> Ix(intensity*dX), Iy(intensity*dY);
+    return ((Ix%=Ix)+=(Iy%=Iy));
+}
+
+//////////////////////////////////////
+// implementation of class Kernel2D //
+//////////////////////////////////////
+
+template <class T>
+Kernel2D<T> :: Kernel2D() : Table2D(1,1,1), m_centerX(1), m_centerY(1) {m_center = m_container + shift();}
+
+template <class T>
+Kernel2D<T> :: Kernel2D(unsigned width, unsigned height, int centX, int centY, T val) 
+: Table2D(width,height,val) 
+{ 
+    Assert(Table2D::pointIn(centX,centY),"center point is not in-range (Kernel2D constructor)");
+    m_centerX = centX;
+    m_centerY = centY;
+    m_center = m_container + shift();
+} 
+
+template <class T>
+Kernel2D<T> :: Kernel2D(unsigned width, unsigned height, Point center, T val) 
+: Table2D(width,height,val) 
+{ 
+    Assert(Table2D::pointIn(center),"center point is not in-range (Kernel2D constructor)");
+    m_centerX = center.x;
+    m_centerY = center.y;
+    m_center = m_container + shift();
+} 
+
+template <class T>
+Kernel2D<T> :: Kernel2D(unsigned width, unsigned height, T val) 
+: Table2D(width,height,val) 
+{
+    m_centerX = (int) width/2;
+    m_centerY = (int) height/2; 
+    m_center = m_container + shift();
+} 
+
+template <class T> // copy constructor
+Kernel2D<T> :: Kernel2D(const Kernel2D<T>& src) 
+: Table2D(src)
+{
+    m_centerX = src.m_centerX;
+    m_centerY = src.m_centerY; 
+    m_center = m_container + shift();
+}
+
+template <class T>
+Kernel2D<T>&  Kernel2D<T> :: operator=(const Kernel2D<T>& src)
+{
+    Table2D::operator = ((Table2D<T>)src);
+    m_centerX = src.m_centerX;
+    m_centerY = src.m_centerY; 
+    m_center = m_container + shift();
+    return *this;
+}
+
+template <class T> // constructor from table2D
+Kernel2D<T> :: Kernel2D(const Table2D<T>& src)   
+: Table2D(src)
+{
+    m_centerX = m_width/2;
+    m_centerY = m_height/2; 
+    m_center = m_container + shift();
+}
+
+template <class T> // constructor from table2D
+Kernel2D<T> :: Kernel2D(const Table2D<T>& src, int centerX, int centerY)   
+: Table2D(src)
+{
+    m_centerX = centerX;
+    m_centerY = centerY; 
+    m_center = m_container + shift();
+}
+
+template <class T> // constructor from table2D
+Kernel2D<T> :: Kernel2D(const Table2D<T>& src, Point center)   
+: Table2D(src)
+{
+    m_centerX = center.x;
+    m_centerY = center.y; 
+    m_center = m_container + shift();
+}
+
+template <class T>
+Kernel2D<T>&  Kernel2D<T> :: operator=(const Table2D<T>& src)
+{
+    Table2D::operator = ((Table2D<T>)src);
+    m_centerX = m_width/2;
+    m_centerY = m_height/2; 
+    m_center = m_container + shift();
+    return *this;
+}
+
+template <class T>
+Kernel2D<T> :: ~Kernel2D() {}
+
+template <class T>
+int Kernel2D<T> :: left() const   {return -m_centerX;} 
+
+template <class T>
+int Kernel2D<T> :: right()  const {return ((int)getWidth())-m_centerX-1;} 
+
+template <class T>
+int Kernel2D<T> :: top()    const {return -m_centerY;} 
+	
+template <class T>
+int Kernel2D<T> :: bottom() const {return ((int)getHeight())-m_centerY-1;} 
+
+template <class T>
+T* Kernel2D<T> :: operator[](int x) const
+{
+    Assert(left()<=x && x<=right(),"Kernel2D index is out of bounds (in operator[](int x))");
+    return m_center + x*m_height;
+}
+
+template <class T> 
+T& Kernel2D<T> :: operator[](Point p) const
+{
+    Assert(Kernel2D::pointIn(p),"Table2D point is out of bounds (in operator[](Point p))");		
+    return m_center[p.y+p.x*m_height];
+} 
+
+template <class T>
+Kernel2D<T> Kernel2D<T> :: operator+(const Kernel2D<T>& src) const // sums 2 kernells
+{
+    int le  = ( left()  < src.left())   ?   left() : src.left();
+    int to  = (  top()  < src.top())    ?   top()  : src.top();
+    int ri  = ( right() > src.right())  ?  right() : src.right();
+    int bo  = (bottom() > src.bottom()) ? bottom() : src.bottom();
+    Kernel2D<T> tmp((ri-le+1),(bo-to+1),-le,-to,0);
+    for (int x=le; x<=ri; x++) for (int y=to; y<=bo; y++) 
+    {
+        if (this->pointIn(x,y)) tmp[x][y] += (*this)[x][y];
+        if (src.pointIn(x,y))   tmp[x][y] += src[x][y];
+    }
+    return tmp;
+}
+
+template <class T>
+Kernel2D<T> Kernel2D<T> :: operator-(const Kernel2D<T>& src) const // subtracts 2 kernells
+{
+    return (*this)+src*(-1.0);
+}
+
+template <class T>
+Kernel2D<T> Kernel2D<T> :: operator+(const T& scalar) const // adds a scalar to each T
+{
+    Kernel2D<T> result(*this);
+    for (unsigned i=0; i<(m_width*m_height); i++) result.m_container[i] += scalar;
+    return result;
+}
+
+template <class T>
+Kernel2D<T> Kernel2D<T> :: operator-(const T& scalar) const // subtracts a scalar from each T
+{
+    Kernel2D<T> result(*this);
+    for (unsigned i=0; i<(m_width*m_height); i++) result.m_container[i] -= scalar;
+    return result;
+}
+
+template <class T>
+Kernel2D<T> Kernel2D<T> :: operator*(const T& scalar) const // scalar multiplication 
+{
+    Kernel2D<T> result(*this);
+    for (unsigned i=0; i<(m_width*m_height); i++) result.m_container[i] *= scalar;
+    return result;
+}
+
+template <class T>
+Kernel2D<T> Kernel2D<T> :: operator~() const // returns new transposed kernel
+{
+    Kernel2D<T> result(m_height,m_width,m_centerY,m_centerX);
+    for (unsigned i=0; i<(m_width*m_height); i++) result.m_container[i] = m_container[(i/m_width) +  (i%m_width)*m_height];  
+    return result;
+}

@@ -1,0 +1,41 @@
+#!/bin/sh
+
+if [ $# -eq 2 ]								# check if there are exactly two arguments
+then
+	if [ -f $2 ]							# make sure the file exists and is not a directory
+	then	
+		if [ $1 -eq 0 ]						# check if the smallest number is requested
+		then
+			min=`head -1 $2`				# initalize the min holder with the first number
+			numbers=`cat $2`				# assign all the numbers to a variable
+			for i in $numbers				# check all the numbers
+			do
+				if [ $i -lt $min ]			# check if it is less than all previous
+				then
+					min=$i				# if it is, set it to the min
+				fi
+			done
+			echo "The smallest number in $2 is $min"	# print the smallest number
+		
+		
+		elif [ $1 -eq 1 ]					# check if the largest number is requested
+		then
+			max=`head -1 $2`				# initalize the max holder with the first number
+			numbers=`cat $2`				# assign all the numbers to a variable
+			for j in $numbers				# check all the numbers
+			do
+				if [ $j -gt $max ]			# check if it is greater than all previous
+				then
+					max=$j				# if it is, set it to the max
+				fi
+			done
+			echo "The largest number in $2 is $max"		# print the largest number
+		else
+			echo "Option must be 0 or 1."			# if not 0 or 1, print error
+		fi
+	else
+		echo "$2 not found"					# if file doesnt exist, print error
+	fi
+else
+	echo "Usage: nums option input-file"				# if not exactly 2 arguments, print error
+fi

@@ -1,0 +1,1 @@
+The program takes the 4 bytes in register %l0 and reverses the order of the bytes, storing the reverse version in %l1.

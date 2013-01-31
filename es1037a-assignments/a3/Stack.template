@@ -1,0 +1,47 @@
+// An implementation of templated class "Stack"
+
+#include "cs1037assert.h"  // Our alternative to #include <cassert>  
+
+template <class Item>
+Stack<Item> :: Stack(unsigned int capacity) 
+: m_container(capacity) {} 
+ 
+template <class Item>
+Stack<Item> :: ~Stack() {}
+
+template <class Item>
+bool Stack<Item> :: isEmpty() const {
+    return m_container.isEmpty();
+}
+
+template <class Item>
+bool Stack<Item> :: isFull( ) const {
+    return m_container.isFull();
+}
+
+template <class Item>
+unsigned int Stack<Item> :: getSize( ) const {
+    return m_container.getLength();
+}
+ 
+template <class Item>
+void Stack<Item> :: push(Item k) {
+    // PRECONDITION: m_container must not be full, BUT... 
+    // should be no problem if it has "unlimited capacity"
+    Assert(!m_container.isFull(), "Stack is full (in push)");
+    m_container.insert( m_container.getLength()+1, k );
+}
+ 
+template <class Item>
+Item Stack<Item> :: pop( ) {
+    // PRECONDITION: the stack must not already be empty
+    Assert(!isEmpty(),"Stack is empty (in pop)");
+    return m_container.remove(m_container.getLength());
+}
+
+template <class Item>
+Item Stack<Item> :: peek( ) const{
+    // PRECONDITION: the stack must not be empty
+    Assert(!isEmpty(),"Stack is empty (in peek)");
+    return m_container.retrieve(m_container.getLength());
+}

@@ -1,0 +1,5 @@
+The bug in this program has to do with improperly accounting for piplining. The counter is supposed to count down and then eventually
+branch. However, while the branch execution is being excecuted the processor is already fetching the function directly after it. As a
+result after the branch instruction is executed it executes the inc instruction before going back to the loop label. The result is
+the counter's value continuously cycling between 3 and 4 and hence the program gets stuck in the loop. This could be fixed by adding
+a nop instruction after the branch instruction.
