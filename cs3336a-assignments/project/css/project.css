@@ -1,0 +1,165 @@
+body
+{
+	padding:0;
+	margin:0;
+	color:#000;
+	font-family: arial, sans-Serif;
+	font-size: 13px;
+}
+
+#loginbody
+{
+	width: 310px;
+	position: relative;
+	margin: 70px auto;
+	padding-top: 7px;
+}
+
+
+#inputArea
+{
+	font-family: Arial, Sans-Serif;
+	font-size: 13px;
+	background-color: #d6e5f4;
+	padding: 10px;
+	width:310px;
+}
+
+#inputArea input, 
+#inputArea textarea,
+#inputArea select
+{
+	font-family: Arial, Sans-Serif;
+	font-size: 13px;
+	margin-bottom: 5px;
+	display: block;
+	padding: 4px;
+	width: 300px;
+	box-sizing: content-box;
+	-moz-box-sizing: content-box;
+	-ms-box-sizing: content-box;
+	-webkit-box-sizing: content-box;
+	background-color: #ffffff;
+	border: solid 1px #33677F;
+	overflow: hidden;
+}
+
+
+#inputArea input.submit 
+{
+	font-family: Arial, Sans-Serif;
+	font-size: 15px;
+	display: block;
+	width: 100px;
+	color: #fff;
+	background-color: #5384c6;
+	margin-left: auto;
+    margin-right: auto;
+	text-align:center;
+}
+
+
+#inputArea input.submit:hover 
+{
+	position: relative;
+	top: 1px;
+	left: 1px;
+	background-color: #f00;
+}
+
+
+#inputArea span
+{
+	font-family: Arial, Sans-Serif;
+	font-size: 11px;
+	display: block;
+	margin-top: -2px;
+	padding-bottom: 20px;
+	width: 300px;
+	color: #f50213;
+	box-sizing: content-box;
+	-moz-box-sizing: content-box;
+	-ms-box-sizing: content-box
+}
+
+#appbody {
+	width: 1000px;
+	position: relative;
+	margin: 10px auto;
+	padding-top: 7px;
+}
+
+#top {
+	background-color: #2ba8dc;
+	width: 1000px;
+	height: 50px;
+}
+
+#top a {
+	float: right;
+	color: white;
+	text-decoration: none;
+	line-height: 50px;
+	padding-right: 20px;
+}
+
+#top a:hover {
+	text-decoration: underline;
+}
+
+#leftside {
+	width: 200px;
+	float: left;
+	color: #2ba8dc;
+}
+
+#leftside span{
+	font-weight: bold;
+}
+
+#graph {
+	width: 700px;
+	height: 408px;
+	float: left;
+}
+
+#loading {
+	display: none;
+	position: absolute;
+	top: 215px;
+	left: 510px;
+	border: 1px solid black;
+}
+
+#error {
+	display: none;
+	color: #fe0000;
+	font-size: 25px;
+	text-align: center;
+	line-height: 408px;
+	margin: 0px;
+}
+
+#leftarrow {
+	width: 50px;
+	float: left;
+	margin-top: 135px;
+}
+
+#rightarrow {
+	width: 50px;
+	float: left;
+	margin-top: 135px;
+}
+
+#rightarrow img{
+	transform:rotate(180deg);
+	-ms-transform:rotate(180deg); /* IE 9 */
+	-moz-transform:rotate(180deg); /* Firefox */
+	-webkit-transform:rotate(180deg); /* Safari and Chrome */
+	-o-transform:rotate(180deg); /* Opera */
+}
+
+img.hoverimage {
+	display: none;
+}

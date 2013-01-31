@@ -1,0 +1,89 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" xml:lang="en-US" lang="en-US">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Sean Watson | CS3336 HW1</title>
+
+<script src="./js/jQuery/jquery-1.6.4.min.js" type="text/javascript"></script>
+
+<link rel="stylesheet" href="./css/hw1.css" type="text/css" media="screen" />
+
+<script type="text/javascript">
+	$(document).ready(function() {
+
+		<!-- Cycle through images in reverse order -->
+		$("#prev").click( function(){
+			var $active = $("#active_img");
+			if($active.attr("src") == "img/image1.jpg"){
+				$active.removeAttr("id");
+				$('#center img[src="img/image4.jpg"]').attr("id", "active_img");
+			}
+			else{
+				$active.removeAttr("id").prev().attr("id", "active_img");
+			}
+		});
+		
+		<!-- Cycle through images in forward order -->
+		$("#next").click( function(){
+			var $active = $("#active_img");
+			if($active.attr("src") == "img/image4.jpg"){
+				$active.removeAttr("id");
+				$('#center img[src="img/image1.jpg"]').attr("id", "active_img");
+			}
+			else{
+				$active.removeAttr("id").next().attr("id", "active_img");
+			}
+		});
+		
+		<!-- Set the large image to match the thumbnail when clicked -->
+		$("#content .thumbs img").click( function(){
+			$("#active_img").removeAttr("id");
+			$('#center img[src="img/' + $(this).attr("src").substring(10) + '"]').attr("id", "active_img");
+		});
+		
+		<!-- Do not allow images to be dragged -->
+		$("img").bind("dragstart", function(event){
+			event.preventDefault();
+		});
+	});
+</script>
+
+</head>
+
+<body>
+<div class="mainbody">
+	
+	<!-- Top banner image -->
+	<div id="banner">
+		<img src="img/banner.jpg" alt="UWO Banner" width="952" height="80"/>
+	</div>
+
+	<!-- All of the main content images -->
+	<div id="content">
+		
+		<!-- Two thumbnail images on the left side of the page -->
+		<div class="thumbs">
+			<img src="img/thumb/image1.jpg" alt="Image 1" width="200" height="150"/>
+			<img src="img/thumb/image2.jpg" alt="Image 2" width="200" height="150"/>
+		</div>
+		
+		<!-- The center large image and the next and previous links -->
+		<div id="center">
+			<img src="img/image1.jpg" alt="Image 1" width="500" height="320" id="active_img"/>
+			<img src="img/image2.jpg" alt="Image 2" width="500" height="320"/>
+			<img src="img/image3.jpg" alt="Image 3" width="500" height="320"/>
+			<img src="img/image4.jpg" alt="Image 4" width="500" height="320"/>
+			<a id="prev" href="#">Previous</a>
+			<a id="next" href="#">Next</a>
+		</div>
+
+		<!-- The thumbnail images on the right side of the page -->
+		<div class="thumbs">
+			<img src="img/thumb/image3.jpg" alt="Image 3" width="200" height="150"/>
+			<img src="img/thumb/image4.jpg" alt="Image 4" width="200" height="150"/>
+		</div>
+	</div>
+	
+</div>
+</body>
+</html>

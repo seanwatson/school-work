@@ -1,0 +1,39 @@
+body {
+	padding:0;
+	margin:0;
+	font-size: 12px;
+	font-family: arial, sans-serif;  
+	color:#000;
+}
+
+#mainbody {
+	width: 500px;
+	position: relative;
+	margin: 60px auto;
+}
+
+#leftside {
+	float: left;
+	width: 200px;
+}
+
+#leftside input{
+	margin: 5px 5px 5px 0px;
+	vertical-align: -2px;
+}
+
+#rightside {
+	float: left;
+}
+
+#answer {
+	font-size: 20px;
+	color: red;
+	margin: 90px 0px 50px 0px 
+}
+
+#info {
+	font-size: 11px;
+	color: grey;
+	margin: 0px;
+}
